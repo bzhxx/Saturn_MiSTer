@@ -1,5 +1,8 @@
 //============================================================================
 //
+//  Arrow SoCKit / DE10-Standard / DE1-SoC MiSTer hardware abstraction module 
+//  2022 by Somhic https://github.com/somhi, based on 2019 work by modernhackers
+//
 //  MiSTer hardware abstraction module
 //  (c)2017-2020 Alexey Melnikov
 //
@@ -22,39 +25,40 @@
 module sys_top
 (
 	/////////// CLOCK //////////
+
 	input         FPGA_CLK1_50,
 	input         FPGA_CLK2_50,
 	input         FPGA_CLK3_50,
 
 	//////////// HDMI //////////
-	output        HDMI_I2C_SCL,
-	inout         HDMI_I2C_SDA,
+	// output        HDMI_I2C_SCL,
+	// inout         HDMI_I2C_SDA,
 
-	output        HDMI_MCLK,
-	output        HDMI_SCLK,
-	output        HDMI_LRCLK,
-	output        HDMI_I2S,
+	// output        HDMI_MCLK,
+	// output        HDMI_SCLK,
+	// output        HDMI_LRCLK,
+	// output        HDMI_I2S,
 
-	output        HDMI_TX_CLK,
-	output        HDMI_TX_DE,
-	output [23:0] HDMI_TX_D,
-	output        HDMI_TX_HS,
-	output        HDMI_TX_VS,
+	// output        HDMI_TX_CLK,
+	// output        HDMI_TX_DE,
+	// output [23:0] HDMI_TX_D,
+	// output        HDMI_TX_HS,
+	// output        HDMI_TX_VS,
 	
-	input         HDMI_TX_INT,
+	// input         HDMI_TX_INT,
 
 	//////////// SDR ///////////
 	output [12:0] SDRAM_A,
 	inout  [15:0] SDRAM_DQ,
-	output        SDRAM_DQML,
-	output        SDRAM_DQMH,
+	//output        SDRAM_DQML,
+	//output        SDRAM_DQMH,
 	output        SDRAM_nWE,
 	output        SDRAM_nCAS,
 	output        SDRAM_nRAS,
 	output        SDRAM_nCS,
 	output  [1:0] SDRAM_BA,
 	output        SDRAM_CLK,
-	output        SDRAM_CKE,
+	//output        SDRAM_CKE,
 
 `ifdef MISTER_DUAL_SDRAM
 	////////// SDR #2 //////////
@@ -69,76 +73,143 @@ module sys_top
 
 `else
 	//////////// VGA ///////////
-	output  [5:0] VGA_R,
-	output  [5:0] VGA_G,
-	output  [5:0] VGA_B,
+	//SoCkit, DE10-standard, DE1-SoC implementation needs 8 bit color otherwise the brightness is low on the DAC
+	output  [7:0] VGA_R,
+	output  [7:0] VGA_G,
+	output  [7:0] VGA_B,
 	inout         VGA_HS,  // VGA_HS is secondary SD card detect when VGA_EN = 1 (inactive)
 	output		  VGA_VS,
-	input         VGA_EN,  // active low
+	//input       VGA_EN,  // active low
+	//SoCkit, DE10-standard, DE1-SoC implementation for on-board VGA DAC route - additional pins
+	output 		  VGA_CLK,
+	output 		  VGA_BLANK_N,
+	output 		  VGA_SYNC_N,
 
 	/////////// AUDIO //////////
-	output		  AUDIO_L,
-	output		  AUDIO_R,
-	output		  AUDIO_SPDIF,
+	//output		  AUDIO_L,
+	//output		  AUDIO_R,
+	//output		  AUDIO_SPDIF,
+
+	//SoCkit, DE10-standard, DE1-SoC implementation for on-board AUDIO CODEC
+	inout wire    AUD_ADCLRCK,  // Audio CODEC ADC LR Clock
+	input wire    AUD_ADCDAT,   // Audio CODEC ADC Data
+	inout wire    AUD_DACLRCK,  // Audio CODEC DAC LR Clock
+	output wire   AUD_DACDAT,   // Audio CODEC DAC Data
+    inout wire    AUD_BCLK,     // Audio CODEC Bit-Stream Clock
+    output wire   AUD_XCK,      // Audio CODEC Chip Clock
+    output wire   AUD_MUTE,		// Audio CODEC Mute (active low)
+	// I2C Audio CODEC
+    inout wire    AUD_I2C_SDAT,     // I2C Data
+    output wire   AUD_I2C_SCLK,     // I2C Clock
 
 	//////////// SDIO ///////////
-	inout   [3:0] SDIO_DAT,
-	inout         SDIO_CMD,
-	output        SDIO_CLK,
+	//inout   [3:0] SDIO_DAT,
+	//inout         SDIO_CMD,
+	//output        SDIO_CLK,
 
 	//////////// I/O ///////////
-	output        LED_USER,
-	output        LED_HDD,
-	output        LED_POWER,
-	input         BTN_USER,
-	input         BTN_OSD,
-	input         BTN_RESET,
+//	output        LED_USER,
+//	output        LED_HDD,
+//	output        LED_POWER,
+//	input         BTN_USER,
+//	input         BTN_OSD,
+//	input         BTN_RESET,
 `endif
 
 	////////// I/O ALT /////////
-	output        SD_SPI_CS,
-	input         SD_SPI_MISO,
-	output        SD_SPI_CLK,
-	output        SD_SPI_MOSI,
+	// output        SD_SPI_CS,
+	// input         SD_SPI_MISO,
+	// output        SD_SPI_CLK,
+	// output        SD_SPI_MOSI,
 
-	inout         SDCD_SPDIF,
-	output        IO_SCL,
-	inout         IO_SDA,
+	//inout         SDCD_SPDIF,
+	//output        IO_SCL,
+	//inout         IO_SDA,
 
 	////////// ADC //////////////
-	output        ADC_SCK,
-	input         ADC_SDO,
-	output        ADC_SDI,
-	output        ADC_CONVST,
+	// output        ADC_SCK,
+	// input         ADC_SDO,
+	// output        ADC_SDI,
+	// output        ADC_CONVST,
 
 	////////// MB KEY ///////////
 	input   [1:0] KEY,
 
 	////////// MB SWITCH ////////
-	input   [3:0] SW,
+	//input   [3:0] SW,
+	//SoCkit, DE10-standard, DE1-SoC board implementation
+	inout   [3:0] SW,
 
 	////////// MB LED ///////////
-	output  [7:0] LED,
+	//output  [7:0] LED
+	//SoCkit, DE10-standard, DE1-SoC board implementation
+	output LED_0_USER,
+	output LED_1_HDD,
+	output LED_2_POWER,
+	output LED_3_LOCKED
+	//,
 
 	///////// USER IO ///////////
-	inout   [6:0] USER_IO
+	//inout   [6:0] USER_IO
 );
+
+//SoCkit, DE10-standard, DE1-SoC board implementation
+wire        HDMI_TX_CLK;
+wire        HDMI_TX_DE;
+wire [23:0] HDMI_TX_D;
+wire        HDMI_TX_HS;
+wire        HDMI_TX_VS;
+wire        HDMI_TX_INT;
+wire        HDMI_I2C_SCL;
+wire        HDMI_I2C_SDA;
+wire        HDMI_MCLK;
+wire        HDMI_SCLK;
+wire        HDMI_LRCLK;
+wire        HDMI_I2S;
+
+wire        ADC_SCK;
+wire        ADC_SDO;
+wire        ADC_SDI;
+wire        ADC_CONVST;
+
+wire        SD_SPI_CS;
+wire        SD_SPI_MISO;
+wire        SD_SPI_CLK;
+wire        SD_SPI_MOSI;
+
+wire   [7:0] LED;
+
+assign LED_0_USER   = LED[0];
+assign LED_1_HDD    = LED[2];
+assign LED_2_POWER  = LED[4];
+assign LED_3_LOCKED = LED[6];
+
+// DE10-Standard / DE1-SoC / SoCKit implementation for on-board VGA DAC route - this will be overrided by code to set value to 0
+wire   VGA_EN;  // active low
+assign VGA_EN = 1'b0;		//enable VGA mode when VGA_EN is low
+
+wire VGA_DISABLE;
+assign VGA_DISABLE = 1'b0;
+
+// DE10-Standard / DE1-SoC / Arrow SoCKit VGA mode
+assign SW[3] = 1'b0;		//necessary for VGA mode
+
 
 //////////////////////  Secondary SD  ///////////////////////////////////
 wire SD_CS, SD_CLK, SD_MOSI;
 
-`ifndef MISTER_DUAL_SDRAM
-	wire sd_miso = SW[3] | SDIO_DAT[0];
-`else
+//`ifndef MISTER_DUAL_SDRAM
+//	wire sd_miso = SW[3] | SDIO_DAT[0];
+//`else
 	wire sd_miso = 1;
-`endif
+//`endif
 wire SD_MISO = mcp_sdcd ? sd_miso : SD_SPI_MISO;
 
 `ifndef MISTER_DUAL_SDRAM
-	assign SDIO_DAT[2:1]= 2'bZZ;
-	assign SDIO_DAT[3]  = SW[3] ? 1'bZ  : SD_CS;
-	assign SDIO_CLK     = SW[3] ? 1'bZ  : SD_CLK;
-	assign SDIO_CMD     = SW[3] ? 1'bZ  : SD_MOSI;
+	//assign SDIO_DAT[2:1]= 2'bZZ;
+	//assign SDIO_DAT[3]  = SW[3] ? 1'bZ  : SD_CS;
+	//assign SDIO_CLK     = SW[3] ? 1'bZ  : SD_CLK;
+	//assign SDIO_CMD     = SW[3] ? 1'bZ  : SD_MOSI;
 	assign SD_SPI_CS    = mcp_sdcd ? ((~VGA_EN & sog & ~cs1) ? 1'b1 : 1'bZ) : SD_CS;
 `else
 	assign SD_SPI_CS    = mcp_sdcd ? 1'bZ : SD_CS;
@@ -157,24 +228,25 @@ wire led_d =  led_disk[1]  ? ~led_disk[0]  : ~(led_disk[0] | gp_out[29]);
 wire led_u = ~led_user;
 wire led_locked;
 
-`ifndef MISTER_DUAL_SDRAM
-	assign LED_POWER = (SW[3] | led_p) ? 1'bZ : 1'b0;
-	assign LED_HDD   = (SW[3] | led_d) ? 1'bZ : 1'b0;
-	assign LED_USER  = (SW[3] | led_u) ? 1'bZ : 1'b0;
-`endif
+//`ifndef MISTER_DUAL_SDRAM
+//	assign LED_POWER = (SW[3] | led_p) ? 1'bZ : 1'b0;
+//	assign LED_HDD   = (SW[3] | led_d) ? 1'bZ : 1'b0;
+//	assign LED_USER  = (SW[3] | led_u) ? 1'bZ : 1'b0;
+//`endif
 
 //LEDs on main board
 assign LED = (led_overtake & led_state) | (~led_overtake & {1'b0,led_locked,1'b0, ~led_p, 1'b0, ~led_d, 1'b0, ~led_u});
 
 wire btn_r, btn_o, btn_u;
-`ifdef MISTER_DUAL_SDRAM
+//`ifdef MISTER_DUAL_SDRAM
 	assign {btn_r,btn_o,btn_u} = {mcp_btn[1],mcp_btn[2],mcp_btn[0]};
-`else
-	assign {btn_r,btn_o,btn_u} = ~{BTN_RESET,BTN_OSD,BTN_USER} | {mcp_btn[1],mcp_btn[2],mcp_btn[0]};
-`endif
+//`else
+//	assign {btn_r,btn_o,btn_u} = ~{BTN_RESET,BTN_OSD,BTN_USER} | {mcp_btn[1],mcp_btn[2],mcp_btn[0]};
+//`endif
 
 wire [2:0] mcp_btn;
 wire       mcp_sdcd;
+/*
 mcp23009 mcp23009
 (
 	.clk(FPGA_CLK2_50),
@@ -186,7 +258,7 @@ mcp23009 mcp23009
 	.scl(IO_SCL),
 	.sda(IO_SDA)
 );
-
+*/
 
 reg btn_user, btn_osd;
 always @(posedge FPGA_CLK2_50) begin
@@ -1035,22 +1107,6 @@ wire cfg_ready = 1;
 
 `endif
 
-wire hdmi_config_done;
-hdmi_config hdmi_config
-(
-	.iCLK(FPGA_CLK1_50),
-	.iRST_N(cfg_ready & ~HDMI_TX_INT & ~cfg_dis),
-	.done(hdmi_config_done),
-
-	.I2C_SCL(HDMI_I2C_SCL),
-	.I2C_SDA(HDMI_I2C_SDA),
-
-	.dvi_mode(dvi_mode),
-	.audio_96k(audio_96k),
-	.limited(hdmi_limited),
-	.ypbpr(ypbpr_en & direct_video)
-);
-
 assign HDMI_I2C_SCL = hdmi_scl_en ? 1'b0 : 1'bZ;
 assign HDMI_I2C_SDA = hdmi_sda_en ? 1'b0 : 1'bZ;
 
@@ -1323,11 +1379,16 @@ csync csync_vga(clk_vid, vga_hs_osd, vga_vs_osd, vga_cs_osd);
 
 	wire cs1 = (vga_fb | vga_scaler) ? vgas_cs : vga_cs;
 
-	assign VGA_VS = (VGA_EN | SW[3]) ? 1'bZ      :((((vga_fb | vga_scaler) ? ~vgas_vs : ~vga_vs) | csync_en) ^ VS[12]);
-	assign VGA_HS = (VGA_EN | SW[3]) ? 1'bZ      : (((vga_fb | vga_scaler) ? (csync_en ? ~vgas_cs : ~vgas_hs) : (csync_en ? ~vga_cs : ~vga_hs)) ^ HS[12]);
-	assign VGA_R  = (VGA_EN | SW[3]) ? 6'bZZZZZZ :   (vga_fb | vga_scaler) ? vgas_o[23:18] : vga_o[23:18];
-	assign VGA_G  = (VGA_EN | SW[3]) ? 6'bZZZZZZ :   (vga_fb | vga_scaler) ? vgas_o[15:10] : vga_o[15:10];
-	assign VGA_B  = (VGA_EN | SW[3]) ? 6'bZZZZZZ :   (vga_fb | vga_scaler) ? vgas_o[7:2]   : vga_o[7:2]  ;
+	assign VGA_VS = VGA_DISABLE ? 1'b0      : (VGA_EN | SW[3]) ? 1'bZ      :((((vga_fb | vga_scaler) ? ~vgas_vs : ~vga_vs) | csync_en) ^ VS[12]);
+	assign VGA_HS = VGA_DISABLE ? 1'b0      : (VGA_EN | SW[3]) ? 1'bZ      : (((vga_fb | vga_scaler) ? (csync_en ? ~vgas_cs : ~vgas_hs) : (csync_en ? ~vga_cs : ~vga_hs)) ^ HS[12]);
+	//DE10-standard / DE1-SoC / SoCkit implementation for on-board VGA DAC route - additional 2 bit per color
+	assign VGA_R  = VGA_DISABLE ? 8'b00000000 : (VGA_EN | SW[3]) ? 8'bZZZZZZZZ :   (vga_fb | vga_scaler) ? vgas_o[23:16] : vga_o[23:16];
+	assign VGA_G  = VGA_DISABLE ? 8'b00000000 : (VGA_EN | SW[3]) ? 8'bZZZZZZZZ :   (vga_fb | vga_scaler) ? vgas_o[15:8] : vga_o[15:8];
+	assign VGA_B  = VGA_DISABLE ? 8'b00000000 : (VGA_EN | SW[3]) ? 8'bZZZZZZZZ :   (vga_fb | vga_scaler) ? vgas_o[7:0]   : vga_o[7:0]  ;
+	//DE10-standard / DE1-SoC / SoCkit implementation for on-board VGA DAC route - additional pins
+	assign VGA_BLANK_N = VGA_HS && VGA_VS;  //VGA DAC additional required pin
+	assign VGA_SYNC_N = 0; 					//VGA DAC additional required pin
+	assign VGA_CLK = HDMI_TX_CLK; 			//has to define a clock to VGA DAC clock otherwise the picture is noisy 
 `endif
 
 reg video_sync = 0;
@@ -1357,14 +1418,14 @@ end
 
 /////////////////////////  Audio output  ////////////////////////////////
 
-assign SDCD_SPDIF =(SW[3] & ~spdif) ? 1'b0 : 1'bZ;
+//assign SDCD_SPDIF =(SW[3] & ~spdif) ? 1'b0 : 1'bZ;
 
 `ifndef MISTER_DUAL_SDRAM
 	wire analog_l, analog_r;
 
-	assign AUDIO_SPDIF = SW[3] ? 1'bZ : SW[0] ? HDMI_LRCLK : spdif;
-	assign AUDIO_R     = SW[3] ? 1'bZ : SW[0] ? HDMI_I2S   : analog_r;
-	assign AUDIO_L     = SW[3] ? 1'bZ : SW[0] ? HDMI_SCLK  : analog_l;
+	//assign AUDIO_SPDIF = SW[3] ? 1'bZ : SW[0] ? HDMI_LRCLK : spdif;
+	//assign AUDIO_R     = SW[3] ? 1'bZ : SW[0] ? HDMI_I2S   : analog_r;
+	//assign AUDIO_L     = SW[3] ? 1'bZ : SW[0] ? HDMI_SCLK  : analog_l;
 `endif
 
 assign HDMI_MCLK = clk_audio;
@@ -1441,8 +1502,28 @@ alsa alsa
 	.pcm_r(alsa_r)
 );
 
-////////////////  User I/O (USB 3.0 connector) /////////////////////////
 
+//// DE10-Standard / DE1-SoC / SoCkit Audio CODEC implementation
+
+assign AUD_MUTE    = 1'b1;
+assign AUD_XCK     = HDMI_MCLK;
+assign AUD_DACLRCK = HDMI_LRCLK;
+assign AUD_BCLK    = HDMI_SCLK;
+assign AUD_DACDAT  = HDMI_I2S;
+
+// I2C audio config
+I2C_AV_Config audio_config (
+  // host side
+  .iCLK         (clk_audio        ),
+  .iRST_N       (!reset           ),
+  // i2c side
+  .oI2C_SCLK    (AUD_I2C_SCLK         ),
+  .oI2C_SDAT    (AUD_I2C_SDAT         )
+);
+
+
+////////////////  User I/O (USB 3.0 connector) /////////////////////////
+/*
 assign USER_IO[0] =                       !user_out[0]  ? 1'b0 : 1'bZ;
 assign USER_IO[1] =                       !user_out[1]  ? 1'b0 : 1'bZ;
 assign USER_IO[2] = !(SW[1] ? HDMI_I2S   : user_out[2]) ? 1'b0 : 1'bZ;
@@ -1458,7 +1539,15 @@ assign user_in[3] =         USER_IO[3];
 assign user_in[4] = SW[1] | USER_IO[4];
 assign user_in[5] = SW[1] | USER_IO[5];
 assign user_in[6] =         USER_IO[6];
+*/
 
+assign user_in[0] = 1'b0;
+assign user_in[1] = 1'b0;
+assign user_in[2] = 1'b0;
+assign user_in[3] = 1'b0;
+assign user_in[4] = 1'b0;
+assign user_in[5] = 1'b0;
+assign user_in[6] = 1'b0;
 
 ///////////////////  User module connection ////////////////////////////
 
@@ -1616,15 +1705,15 @@ emu emu
 
 	.SDRAM_DQ(SDRAM_DQ),
 	.SDRAM_A(SDRAM_A),
-	.SDRAM_DQML(SDRAM_DQML),
-	.SDRAM_DQMH(SDRAM_DQMH),
+	//.SDRAM_DQML(SDRAM_DQML),
+	//.SDRAM_DQMH(SDRAM_DQMH),
 	.SDRAM_BA(SDRAM_BA),
 	.SDRAM_nCS(SDRAM_nCS),
 	.SDRAM_nWE(SDRAM_nWE),
 	.SDRAM_nRAS(SDRAM_nRAS),
 	.SDRAM_nCAS(SDRAM_nCAS),
 	.SDRAM_CLK(SDRAM_CLK),
-	.SDRAM_CKE(SDRAM_CKE),
+	//.SDRAM_CKE(SDRAM_CKE),
 
 `ifdef MISTER_DUAL_SDRAM
 	.SDRAM2_DQ(SDRAM2_DQ),
@@ -1645,11 +1734,11 @@ emu emu
 	.SD_MOSI(SD_MOSI),
 	.SD_MISO(SD_MISO),
 	.SD_CS(SD_CS),
-`ifdef MISTER_DUAL_SDRAM
+//`ifdef MISTER_DUAL_SDRAM
 	.SD_CD(mcp_sdcd),
-`else
-	.SD_CD(mcp_sdcd & (SW[0] ? VGA_HS : (SW[3] | SDCD_SPDIF))),
-`endif
+//`else
+//	.SD_CD(mcp_sdcd & (SW[0] ? VGA_HS : (SW[3] | SDCD_SPDIF))),
+//`endif
 
 	.UART_CTS(uart_rts),
 	.UART_RTS(uart_cts),
