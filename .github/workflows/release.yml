@@ -3,7 +3,7 @@
 # SPDX-FileType: OTHER
 # SPDX-FileCopyrightText: (c) 2021-2022, The Raetro authors and contributors
 ################################################################################
-name: Release (Single and Dual SDRAM)
+name: Release (Single SDRAM for sockit)
 ################################################################################
 # How to create a tag to launch the workflow
 # git tag 20221231
@@ -45,8 +45,8 @@ jobs:
       - name: Run compilation flow for Single SDRAM
         run: quartus_sh --flow compile Saturn.qpf
       # 6 - RTL synthesis Dual SDRAM
-      - name: Run compilation flow for Dual SDRAM
-        run: quartus_sh --flow compile Saturn_DS.qpf
+      #- name: Run compilation flow for Dual SDRAM
+      #  run: quartus_sh --flow compile Saturn_DS.qpf
       # 7 - Get current version for tagging binary
       - name: Get the version
         id: version
@@ -56,9 +56,9 @@ jobs:
         run: |
           mkdir -p releases
           cp output_files/Saturn.rbf releases/Saturn_${{ steps.version.outputs.version }}.rbf
-          cp output_files/Saturn_DS.rbf releases/Saturn_DS_${{ steps.version.outputs.version }}.rbf
+          # cp output_files/Saturn_DS.rbf releases/Saturn_DS_${{ steps.version.outputs.version }}.rbf
           ( cd output_files && sha256sum Saturn.rbf > ../releases/Saturn_${{ steps.version.outputs.version }}.rbf.sha256 )
-          ( cd output_files && sha256sum Saturn_DS.rbf > ../releases/Saturn_DS_${{ steps.version.outputs.version }}.rbf.sha256 )
+          # ( cd output_files && sha256sum Saturn_DS.rbf > ../releases/Saturn_DS_${{ steps.version.outputs.version }}.rbf.sha256 )
       # 9 - Create a new GitHub release and upload the distribution artifacts
       - name: Create a new GitHub release
         uses: softprops/action-gh-release@v0.1.14
@@ -67,8 +67,8 @@ jobs:
           files: |
             releases/Saturn_${{ steps.version.outputs.version }}.rbf
             releases/Saturn_${{ steps.version.outputs.version }}.rbf.sha256
-            releases/Saturn_DS_${{ steps.version.outputs.version }}.rbf
-            releases/Saturn_DS_${{ steps.version.outputs.version }}.rbf.sha256
+            #releases/Saturn_DS_${{ steps.version.outputs.version }}.rbf
+            #releases/Saturn_DS_${{ steps.version.outputs.version }}.rbf.sha256
       # 9 - Commit Binary to Repository (aka. the MiST(er) way)
       #- name: Commit release back to repository
       #  run: |
